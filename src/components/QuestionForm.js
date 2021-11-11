@@ -1,25 +1,57 @@
 import React, { useState } from "react";
 
 function QuestionForm(props) {
+  //important constants
+  const API_URL = 'http://localhost:4000/questions';  
+  //controlled form data
   const [formData, setFormData] = useState({
     prompt: "",
-    answer1: "",
-    answer2: "",
-    answer3: "",
-    answer4: "",
+    answer1: '',
+    answer2: '',
+    answer3: '',
+    answer4: '',
     correctIndex: 0,
   });
 
   function handleChange(event) {
+    let name = event.target.name;
+    let value = event.target.value;
     setFormData({
       ...formData,
-      [event.target.name]: event.target.value,
-    });
-  }
+      [name]: value,
+      });
+  }    
+  
 
   function handleSubmit(event) {
     event.preventDefault();
     console.log(formData);
+    let formattedFormData = {
+      prompt: formData.prompt,
+      answers: [formData.answer1, formData.answer2, formData.answer3, formData.answer4],
+      correctIndex: formData.correctIndex,
+    }
+
+    console.log(formattedFormData);
+
+    const postConfig = {
+      method: 'POST',
+      headers: {'Content-Type': 'application/JSON'},
+      body: JSON.stringify(formattedFormData)
+    }
+
+    fetch(API_URL, postConfig)
+    .then(res => res.json())
+    .then(questionObj => props.updateQuestions(questionObj))
+    .then(() => setFormData({
+      prompt: "",
+      answer1: '',
+      answer2: '',
+      answer3: '',
+      answer4: '',
+      correctIndex: 0,
+    }));
+
   }
 
   return (
